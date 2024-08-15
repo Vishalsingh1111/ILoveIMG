@@ -44,7 +44,7 @@ export const uploadImage = async (req, res) => {
     };
     try {
         const file = await File.create(fileObj);
-        res.status(200).json({ path: `http://localhost:8000/file/${file._id}` });
+        res.status(200).json({ path: `https://iloveimg-backend.onrender.com/file/${file._id}` });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: error.message });
@@ -72,12 +72,12 @@ export const downloadImage = async (req, res) => {
             }
 
             // Clean up files after download
-            try {
-                fs.unlinkSync(filePath); // Delete the original file
-                console.log(`File ${fileName} deleted successfully.`);
-            } catch (unlinkError) {
-                console.error('Error deleting file:', unlinkError.message);
-            }
+            // try {
+            //     fs.unlinkSync(filePath); // Delete the original file
+            //     console.log(`File ${fileName} deleted successfully.`);
+            // } catch (unlinkError) {
+            //     console.error('Error deleting file:', unlinkError.message);
+            // }
 
             // Optionally, you could delete the file record from the database as well
             // await File.findByIdAndDelete(req.params.fileId);

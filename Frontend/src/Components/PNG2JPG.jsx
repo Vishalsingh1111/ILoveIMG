@@ -46,7 +46,7 @@ const PngToJpg = () => {
         const formData = new FormData();
         formData.append("file", selectedFile);
 
-        setMessage("File Converted Successfully !! ");
+        setMessage("Processing your file...");
 
         try {
             const response = await axios.post(
@@ -67,9 +67,10 @@ const PngToJpg = () => {
             document.body.appendChild(link);
             link.click();
             link.remove();
+            setMessage("File Converted and Downloaded Successfully!");
         } catch (error) {
             console.error("Error:", error.response ? error.response.data : error.message);
-            setMessage("Check your local downloads folder.");
+            setMessage("Error in converting");
         }
     };
 
