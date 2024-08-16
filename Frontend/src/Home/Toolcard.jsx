@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaCompress, FaExpandArrowsAlt, FaCrop, FaFileImage, FaMagic, FaSmile, FaSyncAlt } from 'react-icons/fa';
+import Footer from '../Components/Footer';
 
 const ToolCard = ({ icon, title, description, link }) => (
     <a href={link} className="block hover:shadow-lg transition-shadow duration-300 bg-white rounded-md">
@@ -86,15 +87,18 @@ const ToolGrid = () => {
     ];
 
     return (
-        <div className="container mx-auto px-4 py-8 ">
-            <h1 className="text-4xl font-semibold text-center mt-20 mb-8">Every tool you could want to edit images in bulk</h1>
-            <p className="text-2xl text-center text-gray-600 mb-12">Your online photo editor is here and forever free!</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-                {tools.map((tool, index) => (
-                    <ToolCard key={index} icon={tool.icon} title={tool.title} description={tool.description} link={tool.link} />
-                ))}
+        <>
+            <div className="container mx-auto px-4 py-8 ">
+                <h1 className="text-4xl font-semibold text-center mt-20 mb-8">Every tool you could want to edit images in bulk</h1>
+                <p className="text-2xl text-center text-gray-600 mb-12">Your online photo editor is here and forever free!</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+                    {tools.map((tool, index) => (
+                        <ToolCard key={index} icon={tool.icon} title={tool.title} description={tool.description} link={tool.link} />
+                    ))}
+                </div>
             </div>
-        </div>
+            <Footer />
+        </>
     );
 };
 
