@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaFileImage } from 'react-icons/fa';
+import { FaExpandArrowsAlt } from 'react-icons/fa';
 import Navbar from './Navbar';
 import { baseUrl } from '../../baseUrl';
 
@@ -186,7 +186,7 @@ const ImageResizer = () => {
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
                         >
-                            <FaFileImage className="text-5xl lg:w-[40%] lg:h-[40%] mx-auto text-blue-500 mb-8" />
+                            <FaExpandArrowsAlt className="text-5xl lg:w-[40%] lg:h-[40%] mx-auto text-blue-500 mb-8" />
                             <div className="text-3xl">Drag and Drop Images</div>
                             <div className="my-4 font-bold text-center text-2xl">OR</div>
                             <input

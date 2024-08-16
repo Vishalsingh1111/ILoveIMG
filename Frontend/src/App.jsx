@@ -9,6 +9,8 @@ import PNG2GIF from './Components/PNG2GIF';
 import Compress_Img from './Components/Compress_img';
 import Resize_Img from './Components/ResizeImg';
 import Crop_Img from './Components/CropImg';
+import Rotate_Img from './Components/Rotateimage';
+import Grayscale_Img from './Components/BlackWhite';
 
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
         <Route path="/compressimg" element={<Compress_Img />} />
         <Route path="/resizeimg" element={<Resize_Img />} />
         <Route path="/cropimage" element={<Crop_Img />} />
+        <Route path="/rotateimage" element={<Rotate_Img />} />
+        <Route path="/blackwhiteimage" element={<Grayscale_Img />} />
       </Routes>
     </Router>
   );

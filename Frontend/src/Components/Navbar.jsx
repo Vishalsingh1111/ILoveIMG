@@ -11,11 +11,14 @@ const Navbar = () => {
                     <ul className="bg-base-100 w-48 rounded-t-none p-2  dark:bg-slate-900 dark:text-white">
                         <li><a href='/compressimg'>COMPRESS IMAGE</a></li>
                         <li><a href='/resizeimg'>RESIZE IMAGE</a></li>
+                        <li><a href='/cropimage'>CROP IMAGE</a></li>
+
 
                     </ul>
                 </details>
             </li>
-            <li className='font-semibold'><a href='/cropimage'>CROP IMAGE</a></li>
+
+            <li className='font-semibold'><a href='/rotateimage'>ROTATE IMAGE</a></li>
 
             <li className='font-semibold'>
                 <details>
@@ -25,6 +28,7 @@ const Navbar = () => {
                         <li><a href='/jpg2png'>JPG to PNG</a></li>
                         <li><a href='/png2jpg'>PNG to JPG</a></li>
                         <li><a href='/png2gif'>PNG to GIF</a></li>
+                        <li><a href='/blackwhiteimage'>BLACK & WHITE</a></li>
 
 
                     </ul>

@@ -1,26 +1,19 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
+import { FaSyncAlt } from 'react-icons/fa';
 import axios from 'axios';
-import { FaCompress } from 'react-icons/fa';
-import Navbar from './Navbar';
 import { baseUrl } from '../../baseUrl';
+import Navbar from './Navbar';
 
-const ImageCompressor = () => {
+const ImageRotator = () => {
     const [selectedFile, setSelectedFile] = useState(null);
-    const [maxSizeKB, setMaxSizeKB] = useState("");
-    const [quality, setQuality] = useState(100);
+    const [angle, setAngle] = useState(0);
     const [message, setMessage] = useState("");
     const [isDragging, setIsDragging] = useState(false);
-
-    useEffect(() => {
-        if (selectedFile) {
-            const fileSizeKB = selectedFile.size / 1024;
-            setMaxSizeKB(Math.ceil(fileSizeKB));
-        }
-    }, [selectedFile]);
+    const imgRef = useRef(null);
 
     const handleFileChange = (e) => {
         setSelectedFile(e.target.files[0]);
+        setAngle(0); // Reset angle when a new file is selected
     };
 
     const handleDrop = (e) => {
@@ -28,6 +21,7 @@ const ImageCompressor = () => {
         setIsDragging(false);
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             setSelectedFile(e.dataTransfer.files[0]);
+            setAngle(0); // Reset angle when a new file is selected
         }
     };
 
@@ -41,23 +35,33 @@ const ImageCompressor = () => {
         setIsDragging(false);
     };
 
+    const handleAngleChange = (e) => {
+        const newAngle = parseInt(e.target.value, 10);
+        if (!isNaN(newAngle)) {
+            setAngle(newAngle);
+        }
+    };
+
+    const rotateImage = () => {
+        setAngle((prevAngle) => (prevAngle + 90) % 360);
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!selectedFile) {
-            setMessage("Please select a file first");
+            setMessage("Please select a file first.");
             return;
         }
 
         const formData = new FormData();
         formData.append("file", selectedFile);
-        formData.append("maxSizeKB", maxSizeKB);
-        formData.append("quality", quality);
+        formData.append("angle", angle);
 
-        setMessage("Compressing your file...");
+        setMessage("Processing your file...");
 
         try {
             const response = await axios.post(
-                `${baseUrl}/imgcompression`,
+                `${baseUrl}/rotateimage`,
                 formData,
                 {
                     headers: {
@@ -70,11 +74,11 @@ const ImageCompressor = () => {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', selectedFile.name.replace(/\.[^/.]+$/, '') + '-compressed.jpg');
+            link.setAttribute('download', 'rotated_image.png');
             document.body.appendChild(link);
             link.click();
             link.remove();
-            setMessage("File compressed and downloaded successfully.");
+            setMessage("File rotated and downloaded successfully.");
         } catch (error) {
             console.error("Error:", error.response ? error.response.data : error.message);
             setMessage("An error occurred. Please try again.");
@@ -85,17 +89,15 @@ const ImageCompressor = () => {
         <>
             <Navbar />
             <div className="max-w-screen-2xl mx-auto container pt-10 px-6 md:px-40 min-h-screen">
-                {/* Header Section */}
                 <div className="text-center pt-10 mb-10">
                     <h1 className="text-4xl font-semibold text-gray-900 mb-4 mt-4">
-                        COMPRESS YOUR IMAGES
+                        ROTATE YOUR IMAGES
                     </h1>
                     <p className="text-2xl text-gray-600">
-                        Easily reduce the size and quality of your image files without installing any software.
+                        Rotate your image files with ease and download them instantly.
                     </p>
                 </div>
 
-                {/* Main Content Section */}
                 <div className="flex flex-col items-center justify-center">
                     {selectedFile ? (
                         <div className="flex flex-col md:flex-row mx-auto items-center max-w-screen-2xl justify-center">
@@ -105,79 +107,73 @@ const ImageCompressor = () => {
                                 onDragOver={handleDragOver}
                                 onDragLeave={handleDragLeave}
                             >
-                                <div className="text-center md:text-left shadow rounded-lg p-10 bg-white">
+                                <div className="text-center md:text-left shadow rounded-lg p-10 max-h-full bg-white relative">
                                     <img
                                         src={URL.createObjectURL(selectedFile)}
                                         alt="Selected"
                                         className="max-w-full h-auto mb-4"
+                                        ref={imgRef}
+                                        style={{ transform: `rotate(${angle}deg)`, transition: 'transform 0.2s' }}
                                     />
                                     <p className="text-lg font-semibold">{selectedFile.name}</p>
                                 </div>
+
                             </div>
 
-                            {/* Form Inputs */}
                             <div className="flex-1">
-                                <div className="flex flex-col space-y-4 px-10">
+                                <div className="flex flex-row space-y-4 justify-center px-auto">
                                     <div>
-                                        <label className="block text-lg font-medium text-gray-700">Size (KB):</label>
+                                        <label className="block text-lg font-medium text-gray-700">Rotation Angle (degrees):</label>
                                         <input
                                             type="number"
-                                            value={maxSizeKB}
-                                            onChange={(e) => setMaxSizeKB(e.target.value)}
+                                            value={angle}
+                                            onChange={handleAngleChange}
                                             className="mt-1 block w-full py-2 px-3 border border-gray-400 bg-transparent rounded sm:text-sm"
                                         />
+                                        <button
+                                            onClick={rotateImage}
+                                            disabled={!selectedFile}
+                                            className='flex justify-right mx-auto mt-6'>
+                                            <img src='/rotate.png' className='w-6 '></img>
+                                        </button>
                                     </div>
-                                    <div>
-                                        <label className="block text-lg font-medium text-gray-700">Quality (%):</label>
-                                        <input
-                                            type="number"
-                                            value={quality}
-                                            onChange={(e) => setQuality(Number(e.target.value))}
-                                            className="mt-1 block w-full py-2 px-3 border border-gray-400 bg-transparent  rounded sm:text-sm"
-                                        />
-                                    </div>
+
                                 </div>
                                 <div className='flex flex-col mx-auto content-center justify-center mt-10'>
+
                                     <label
-                                        htmlFor="SecondFileInput"
+                                        htmlFor="FileInput"
                                         className="mx-auto px-20 py-4 rounded-lg shadow-lg cursor-pointer bg-blue-500 text-white mb-4"
                                     >
                                         <span className="text-xl text-white">Browse New File</span>
                                     </label>
                                     <input
                                         type="file"
-                                        accept=".png"
+                                        accept=".png,.jpg,.jpeg"
                                         onChange={handleFileChange}
                                         className="hidden"
-                                        id="SecondFileInput"
+                                        id="FileInput"
                                     />
                                     <button
                                         onClick={handleSubmit}
                                         disabled={!selectedFile}
-                                        className="flex text-white bg-red-500 text-xl mx-auto justify-center hover:bg-red-600 disabled:bg-transparent disabled:pointer-events-none duration-300 px-20 py-4 rounded-lg"
+                                        className="flex text-white bg-red-700 text-xl mx-auto justify-center hover:bg-red-600 disabled:bg-transparent disabled:pointer-events-none duration-300 px-20 py-4 rounded-lg"
                                     >
-                                        Compress File
+                                        Rotate Image
                                     </button>
-
                                 </div>
                             </div>
                         </div>
                     ) : (
                         <div
-                            className={`max-w-screen-2xl mx-auto text-center ${isDragging ? 'bg-blue-100' : ''}`}
+                            className={`max-w-screen-2xl mx-auto ${isDragging ? 'bg-blue-100' : ''}`}
                             onDrop={handleDrop}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
                         >
-                            <FaCompress className="text-5xl lg:w-[40%] lg:h-[40%] mx-auto text-blue-500 mb-8" />
+                            <FaSyncAlt className="text-5xl lg:w-[40%] lg:h-[40%] mx-auto text-blue-500 mb-8" />
                             <div className="text-3xl">Drag and Drop Images</div>
-                            <div className="my-4 font-bold text-2xl">OR</div>
-                            <label
-                                htmlFor="FileInput"
-                                className="items-center justify-center px-20 py-5 rounded-lg shadow-lg cursor-pointer bg-blue-500 text-white mt-10"
-                            >
-                                <span className="text-2xl text-white">Browse File</span>
-                            </label>
+                            <div className="my-4 font-bold text-center text-2xl">OR</div>
                             <input
                                 type="file"
                                 accept=".jpg,.jpeg,.png"
@@ -185,17 +181,19 @@ const ImageCompressor = () => {
                                 className="hidden"
                                 id="FileInput"
                             />
+                            <label
+                                htmlFor="FileInput"
+                                className="mx-auto px-20 py-4 rounded-lg shadow-lg cursor-pointer bg-blue-500 text-white"
+                            >
+                                <span className="text-xl">Browse Image</span>
+                            </label>
                         </div>
                     )}
+                    {message && <p className="mt-4 text-lg text-center">{message}</p>}
                 </div>
-                {message && (
-                    <p className={`mt-4 text-lg text-center ${message.includes('Error') ? 'text-red-500' : 'text-blue-500'}`}>
-                        {message}
-                    </p>
-                )}
             </div>
         </>
     );
 };
 
-export default ImageCompressor;
+export default ImageRotator;

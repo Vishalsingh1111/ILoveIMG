@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaCompress, FaExpandArrowsAlt, FaCrop, FaFileImage, FaMagic, FaSmile, FaSyncAlt, FaCode } from 'react-icons/fa';
+import { FaCompress, FaExpandArrowsAlt, FaCrop, FaFileImage, FaMagic, FaSmile, FaSyncAlt } from 'react-icons/fa';
 
 const ToolCard = ({ icon, title, description, link }) => (
     <a href={link} className="block hover:shadow-lg transition-shadow duration-300 bg-white rounded-md">
@@ -54,10 +54,16 @@ const ToolGrid = () => {
             link: '/png2jpg'
         },
         {
-            icon: <FaFileImage className="text-gray-500 text-5xl" />,
+            icon: <FaFileImage className="text-red-500 text-5xl" />,
             title: 'Convert PNG to GIF',
             description: 'Convert PNG images to GIF format. Create animated GIFs in seconds!',
             link: '/png2gif'
+        },
+        {
+            icon: <FaFileImage className="text-gray-500 text-5xl" />,
+            title: 'Convert Color to Black & White',
+            description: 'Convert Colored images to Black & white Image. Change in seconds!',
+            link: '/blackwhiteimage'
         },
         {
             icon: <FaMagic className="text-purple-500 text-5xl" />,
@@ -76,13 +82,7 @@ const ToolGrid = () => {
             title: 'Rotate Image',
             description: 'Rotate JPG, PNG, or GIF images in bulk. Rotate only landscape or portrait images if needed.',
             link: '/rotateimage'
-        },
-        {
-            icon: <FaCode className="text-yellow-500 text-5xl" />,
-            title: 'HTML to Image',
-            description: 'Convert HTML webpages to JPG or SVG. Paste the URL and convert it to an image with a click.',
-            link: '/html2image'
-        },
+        }
     ];
 
     return (

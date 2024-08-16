@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { FaFileImage } from 'react-icons/fa';
+import { FaCrop } from 'react-icons/fa';
 import Navbar from './Navbar';
 import { baseUrl } from '../../baseUrl';
 
@@ -195,7 +195,7 @@ const CropImg = () => {
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
                         >
-                            <FaFileImage className="text-5xl lg:w-[40%] lg:h-[40%] mx-auto text-blue-500 mb-8" />
+                            <FaCrop className="text-5xl lg:w-[40%] lg:h-[40%] mx-auto text-blue-500 mb-8" />
                             <div className="text-3xl">Drag and Drop Images</div>
                             <div className="my-4 font-bold text-center text-2xl">OR</div>
                             <input
