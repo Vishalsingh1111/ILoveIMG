@@ -36,12 +36,12 @@ export const downloadImage = async (req, res) => {
             }
 
             // Clean up files after download
-            // try {
-            //     fs.unlinkSync(filePath); // Delete the original file
-            //     console.log(`File ${fileName} deleted successfully.`);
-            // } catch (unlinkError) {
-            //     console.error('Error deleting file:', unlinkError.message);
-            // }
+            try {
+                fs.unlinkSync(filePath); // Delete the original file
+                console.log(`File ${fileName} deleted successfully.`);
+            } catch (unlinkError) {
+                console.error('Error deleting file:', unlinkError.message);
+            }
 
             // Optionally, you could delete the file record from the database as well
             // await File.findByIdAndDelete(req.params.fileId);
