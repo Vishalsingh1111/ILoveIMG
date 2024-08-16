@@ -1,4 +1,5 @@
 import sharp from 'sharp';
+import { PDFDocument } from 'pdf-lib';
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
@@ -30,6 +31,80 @@ export const convertJPG2PNG = async (req, res) => {
         res.status(500).send('Error processing file');
     }
 };
+
+
+
+//convert img to pdf 
+export const convertImageToPDF = async (req, res) => {
+    try {
+        // Check if a file was uploaded
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const imagePath = req.file.path;
+        const outputDir = path.join(process.cwd(), 'output');
+        const outputPath = path.join(outputDir, `${Date.now()}_output.pdf`);
+
+        // Ensure the output directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir);
+        }
+
+        // Load and process the image using sharp
+        const imageBuffer = await sharp(imagePath).toBuffer();
+        const metadata = await sharp(imageBuffer).metadata();
+
+        // Create a new PDF document
+        const pdfDoc = await PDFDocument.create();
+        const page = pdfDoc.addPage();
+
+        // Embed the image in the PDF based on its type
+        let img;
+        if (metadata.format === 'png') {
+            img = await pdfDoc.embedPng(imageBuffer);
+        } else if (metadata.format === 'jpeg' || metadata.format === 'jpg') {
+            img = await pdfDoc.embedJpg(imageBuffer);
+        } else {
+            return res.status(400).json({ message: 'Unsupported image format!' });
+        }
+
+        // Set the dimensions of the page to match the image
+        const { width, height } = img.scale(1);
+        page.setSize(width, height);
+
+        // Draw the image on the PDF page
+        page.drawImage(img, {
+            x: 0,
+            y: 0,
+            width,
+            height,
+        });
+
+        // Serialize the PDF to bytes
+        const pdfBytes = await pdfDoc.save();
+
+        // Write the PDF to the output file
+        fs.writeFileSync(outputPath, pdfBytes);
+
+        // Send the PDF file to the client
+        res.download(outputPath, (err) => {
+
+            // Remove the uploaded image file
+            fs.unlinkSync(imagePath);
+            fs.unlinkSync(outputPath);
+
+            if (err) {
+                console.error('Error sending file:', err);
+            }
+
+        });
+    } catch (error) {
+        console.error('Error converting image to PDF:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 
 //convert png to jpg
 
@@ -115,8 +190,7 @@ export const compressImage = async (req, res) => {
 
         // If still larger than the target size, try a final adjustment
         if (stats > maxSizeBytes) {
-            // Perform a final compression with adjusted quality or resolution if needed
-            compressionQuality = Math.max(0, compressionQuality - 10); // Reduce quality more if necessary
+            compressionQuality = Math.max(0, compressionQuality - 10);
             compressedBuffer = await compress(compressionQuality);
             stats = compressedBuffer.length;
         }
@@ -179,7 +253,7 @@ export async function CropImage(req, res) {
 }
 
 
-//rsesize image fuction
+//resize image fuction
 export async function resizeImage(req, res) {
     const { file } = req;
     if (!file) {
@@ -214,3 +288,80 @@ export async function resizeImage(req, res) {
     }
 }
 
+// Rotate image
+
+export const rotateImage = async (req, res) => {
+    try {
+        if (!req.file || !req.body.angle) {
+            return res.status(400).json({ message: 'Image and angle are required' });
+        }
+
+        const imagePath = req.file.path;
+        const angle = parseInt(req.body.angle, 10);
+        const outputDir = path.join(process.cwd(), 'output');
+
+        // Ensure the output directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir);
+        }
+
+        const outputPath = path.join(outputDir, `${Date.now()}_rotated.png`);
+
+        // Rotate the image
+        await sharp(imagePath)
+            .rotate(angle)
+            .toFile(outputPath);
+
+        // Send the rotated image as a downloadable file
+        res.download(outputPath, 'rotated_image.png', (err) => {
+            if (err) {
+                console.error('Error sending file:', err);
+            }
+            // Cleanup: Remove the uploaded image and rotated image
+            fs.unlinkSync(imagePath);
+            fs.unlinkSync(outputPath);
+        });
+    } catch (error) {
+        console.error('Error rotating image:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+
+// convert color to balck and white
+export const convertToBlackAndWhite = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'Image file is required' });
+        }
+
+        const imagePath = req.file.path;
+        const outputDir = path.join(process.cwd(), 'output'); // Define outputDir here
+
+        // Ensure the output directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir);
+        }
+
+        const outputPath = path.join(outputDir, `${Date.now()}_bw.png`);
+
+        // Convert image to black and white
+        await sharp(imagePath)
+            .grayscale()
+            .toFile(outputPath);
+
+        // Send the black and white image as a downloadable file
+        res.download(outputPath, 'black_and_white_image.png', (err) => {
+            if (err) {
+                console.error('Error sending file:', err);
+            }
+            // Cleanup: Remove the uploaded image and processed image
+            fs.unlinkSync(imagePath);
+            fs.unlinkSync(outputPath);
+        });
+    } catch (error) {
+        console.error('Error converting image:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
