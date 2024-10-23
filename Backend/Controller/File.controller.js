@@ -8,7 +8,7 @@ export const uploadImage = async (req, res) => {
     };
     try {
         const file = await File.create(fileObj);
-        res.status(200).json({ path: `https://iloveimg-frontend.onrender.com/file/${file._id}` });
+        res.status(200).json({ path: `https://iloveimg-backend.onrender.com/file/${file._id}` });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: error.message });
